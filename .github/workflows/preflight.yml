@@ -1,0 +1,35 @@
+name: Advanced Lab Preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  JOB_1-PREFLIGHT:
+    runs-on:
+      group: my_runner_group
+
+    steps:
+      - name: STEP-1 -- Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: STEP-2 -- Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: STEP-3 -- VERIFY Runner
+        run: |
+          hostname
+          uname -m
+
+      - name: STEP-4 -- Verify Azure
+        run: az account show
+
+      - name: STEP-5 -- Verify Terraform
+        run: terraform version
