@@ -1,7 +1,7 @@
 # ---------- Resource Group ----------
 p_rg = {
   "advanced-dev-rg" = {
-    rg_loc="westeurope"
+    rg_loc = "westeurope"
     manage = "Saurav"
   }
   "advanced-test-rg" = {
