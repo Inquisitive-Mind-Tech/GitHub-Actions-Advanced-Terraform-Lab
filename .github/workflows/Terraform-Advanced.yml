@@ -86,40 +86,40 @@ jobs:
           path: environments/test/tfplan
 
 
-    JOB_3-Terraform-APPLY:
-      needs: JOB_2-Terraform-CD-PLAN
+  JOB_3-Terraform-APPLY:
+    needs: JOB_2-Terraform-CD-PLAN
 
-      if: github.event_name == 'push' && github.ref = 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref = 'refs/heads/main'
 
-      environment: TEST
+    environment: TEST
 
-      runs-on:
-        group: my_runner_group
+    runs-on:
+      group: my_runner_group
 
-      defaults:
-        run:
-          working-directory: environments/test
+    defaults:
+      run:
+        working-directory: environments/test
 
-      steps:
+    steps:
 
-        - name: STEP-1 -- Checkout main
-          uses: actions/checkout@v4
+      - name: STEP-1 -- Checkout main
+        uses: actions/checkout@v4
 
-        - name: STEP-2 -- Login to Azure
-          uses: azure/login@v3 
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: STEP-2 -- Login to Azure
+        uses: azure/login@v3 
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-        - name: STEP-3 -- Terraform INIT
-          run: terraform init
+      - name: STEP-3 -- Terraform INIT
+        run: terraform init
 
-        - name: STEP-4 -- Download Terraform Plan
-          uses: actions/download-artifact@v4
-          with:
-            name: terraform-plan
-            path: environments/tfplan
+      - name: STEP-4 -- Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: environments/tfplan
 
-        - name: STEP-5 -- Terraform APPLY
-          run: terraform apply tfplan
+      - name: STEP-5 -- Terraform APPLY
+        run: terraform apply tfplan
