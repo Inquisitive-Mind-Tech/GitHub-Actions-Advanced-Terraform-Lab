@@ -89,7 +89,7 @@ jobs:
   JOB_3-Terraform-APPLY:
     needs: JOB_2-Terraform-CD-PLAN
 
-    if: github.event_name == 'push' && github.ref = 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     environment: TEST
 
