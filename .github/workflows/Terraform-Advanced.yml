@@ -1,36 +1,125 @@
 name: Terraform Advanced CI/CD
 
 on:
-  push:
-    branches:
-      - feature/trigger-lab
-      - main
-    
   pull_request:
+    branches:
+      - main
+
+  push:
     branches:
       - main
 
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  JOB_1-Trigger_Inspection:
+  JOB_1-Terraform-CI:
+    if: github.event_name == 'pull_request'
+
     runs-on:
       group: my_runner_group
 
+    defaults:
+      run:
+        working-directory:  environments/test
+
     steps:
+
       - name: STEP-1 -- Checkout Repo
         uses: actions/checkout@v4
 
-      - name: STEP-2 -- Inspect GitHub Trigger
-        run: |
-          echo "================================"
-          echo "GitHub Actions Trigger Details"
-          echo "================================"
+      - name: STEP-2 -- Terraform FORMAT Check
+        run: terraform fmt -check -recursive
 
-          echo "Event Name: ${{ github.event_name }}"
-          echo "Git Ref: ${{ github.ref }}"
-          echo "Ref Name: ${{ github.ref_name }}"
-          echo "Head Ref: ${{ github.head_ref }}"
-          echo "Base Ref : ${{ github.base_ref }}"
-          echo "Commit SHA : ${{ github.sha }}"
-          
+      - name: STEP-3 -- LOGIN to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: STEP-4 -- Terraform INIT
+        run: terraform init
+
+      - name: STEP-5 -- Terraform VALIDATE
+        run: terraform validate 
+
+      - name: STEP-6 -- Terraform PLAN
+        run: terraform plan
+
+
+  JOB_2-Terraform-CD-PLAN:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on:
+      group: my_runner_group
+
+    defaults:
+      run:
+        working-directory: environments/test
+
+    steps:
+
+      - name: STEP-1 -- Checkout MAIN
+        uses: actions/checkout@v4
+
+      - name: STEP-2 -- Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: STEP-3 -- Terraform INIT
+        run: terraform init
+
+      - name: STEP-4 -- Terraform PLAN
+        run: terraform plan -out=tfplan
+
+      - name: STEP-5 -- Upload PLAN
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: environments/test/tfplan
+
+
+  JOB_3-Terraform-APPLY:
+    needs: JOB_2-Terraform-CD-PLAN
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    environment: TEST
+
+    runs-on:
+      group: my_runner_group
+
+    defaults:
+      run:
+        working-directory: environments/test
+
+    steps:
+
+      - name: STEP-1 -- Checkout main
+        uses: actions/checkout@v4
+
+      - name: STEP-2 -- Login to Azure
+        uses: azure/login@v3 
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: STEP-3 -- Terraform INIT
+        run: terraform init
+
+      - name: STEP-4 -- Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-plan
+          path: environments/tfplan
+
+      - name: STEP-5 -- Terraform APPLY
+        run: terraform apply tfplan
