@@ -119,7 +119,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: terraform-plan
-          path: environments/tfplan
+          path: environments/test
 
       - name: STEP-5 -- Terraform APPLY
         run: terraform apply tfplan
