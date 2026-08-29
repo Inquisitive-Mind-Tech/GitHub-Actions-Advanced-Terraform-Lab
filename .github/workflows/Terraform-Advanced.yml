@@ -127,7 +127,7 @@ jobs:
 
   JOB_4-Pipeline-Diagnostics:
     runs-on:
-      runner: my_runner_group
+      group: my_runner_group
 
     if: always()
     
