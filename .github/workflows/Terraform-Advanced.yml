@@ -123,3 +123,24 @@ jobs:
 
       - name: STEP-5 -- Terraform APPLY
         run: terraform apply tfplan
+
+
+  JOB_4-Pipeline-Diagnostics:
+    runs-on:
+      runner: my_runner_group
+
+    if: always()
+    
+    steps:
+
+      - name: STEP-1 -- Display Pipeline Result
+        run: |
+          echo: "==================================="
+          echo: "Pipeline Diagnostics"
+          echo: "==================================="
+          echo: "Event: ${{ github.event_name }}"
+          echo: "Branch/Ref: ${{ github.ref }}"
+          echo: "Workflow: ${{ github.workflow }}"
+          echo: "Run ID: ${{ github.run_id }}"
+
+        
