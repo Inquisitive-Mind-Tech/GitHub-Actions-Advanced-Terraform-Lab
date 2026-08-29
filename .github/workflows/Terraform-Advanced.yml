@@ -135,12 +135,11 @@ jobs:
 
       - name: STEP-1 -- Display Pipeline Result
         run: |
-          echo: "==================================="
-          echo: "Pipeline Diagnostics"
-          echo: "==================================="
-          echo: "Event: ${{ github.event_name }}"
-          echo: "Branch/Ref: ${{ github.ref }}"
-          echo: "Workflow: ${{ github.workflow }}"
-          echo: "Run ID: ${{ github.run_id }}"
-
-        
+          echo "==================================="
+          echo "Pipeline Diagnostics"
+          echo "==================================="
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch/Ref: ${{ github.ref }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
+       
