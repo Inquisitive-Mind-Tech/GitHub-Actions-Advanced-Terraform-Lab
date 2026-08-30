@@ -126,6 +126,9 @@ jobs:
 
 
   JOB_4-Pipeline-Diagnostics:
+    needs: 
+      - JOB_1-Terraform-CI
+
     runs-on:
       group: my_runner_group
 
