@@ -154,13 +154,13 @@ jobs:
           echo "JOB_1 result: ${{ needs.JOB_1-Terraform-CI.result }}"
 
       - name: STEP-3 -- CI Success Message
-          if: needs.JOB_1-Terraform-CI.result == 'success'
-          run: |
-            echo "JOB 1 Terraform CI completed successfully"
-            echo "Pipeline can proceed with the next stage."
+        if: needs.JOB_1-Terraform-CI.result == 'success'
+        run: |
+          echo "JOB 1 Terraform CI completed successfully"
+          echo "Pipeline can proceed with the next stage."
 
       - name: STEP-4 -- CI Failure Message
-          if: needs.JOB_1-Terraform-CI.result == 'failure'
-          run: |
-            echo "JOB 1 Terraform CI has FAILED."
-            echo "Terraform deployment should NOT proceed."
+        if: needs.JOB_1-Terraform-CI.result == 'failure'
+        run: |
+          echo "JOB 1 Terraform CI has FAILED."
+          echo "Terraform deployment should NOT proceed."
