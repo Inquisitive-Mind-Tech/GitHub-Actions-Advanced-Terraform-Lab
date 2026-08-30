@@ -149,3 +149,8 @@ jobs:
           echo "Workflow: ${{ github.workflow }}"
           echo "Run ID: ${{ github.run_id }}"
        
+      - name: STEP-2 -- Show Upstream Job Result
+        run: |
+          echo "JOB_1 result : ${{ needs.JOB_1-Terraform-CI.result }}"
+
+      
