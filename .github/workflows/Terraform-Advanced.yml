@@ -50,6 +50,9 @@ jobs:
       - name: STEP-6 -- Terraform PLAN
         run: terraform plan
 
+      - name: STEP-7 -- Force Failure for Conditions Lab
+        run: exit 1
+
 
   JOB_2-Terraform-CD-PLAN:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
