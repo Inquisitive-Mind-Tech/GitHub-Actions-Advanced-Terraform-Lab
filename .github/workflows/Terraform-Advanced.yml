@@ -153,12 +153,10 @@ jobs:
       - name: STEP-3 -- Main Branch Deployment Eligible
         if: |
           github.event_name == 'push' &&
-          github.ref == 'refs/heads/main' &&
-          needs.JOB_1-Terraform-CI.result == 'success'
+          github.ref == 'refs/heads/main'
         run: |
           echo "Push to main detected."
-          echo "CI succeeded."
-          echo "This run is eligible to continue toward deployment."
+          echo "This run is eligible for the CD path."
 
       - name: STEP-4 -- CI Failure
         if: needs.JOB_1-Terraform-CI.result == 'failure'
