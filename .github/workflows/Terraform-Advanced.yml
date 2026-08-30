@@ -136,28 +136,32 @@ jobs:
     
     steps:
 
-      - name: STEP-1 -- Display Pipeline Result
+      - name: STEP-1 -- Show Upstream Result
         run: |
-          echo "==================================="
-          echo "Pipeline Diagnostics"
-          echo "==================================="
+          echo "JOB_1 Result: ${{ needs.JOB_1-Terraform-CI.result }}"
           echo "Event: ${{ github.event_name }}"
-          echo "Branch/Ref: ${{ github.ref }}"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Run ID: ${{ github.run_id }}"
+          echo "Ref: ${{ github.ref }}"
        
-      - name: STEP-2 -- Show Upstream Job Result
+      - name: STEP-2 -- PR CI Success
+        if: |
+          github.event_name == 'pull_request' &&
+          needs.JOB_1-Terraform-CI.result == 'success'
         run: |
-          echo "JOB_1 result: ${{ needs.JOB_1-Terraform-CI.result }}"
+          echo "PR validation Succeeded"
+          echo "No deployment should happen here."
 
-      - name: STEP-3 -- CI Success Message
-        if: needs.JOB_1-Terraform-CI.result == 'success'
+      - name: STEP-3 -- Main Branch Deployment Eligible
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          needs.JOB_1-Terraform-CI.result == 'success'
         run: |
-          echo "JOB 1 Terraform CI completed successfully"
-          echo "Pipeline can proceed with the next stage."
+          echo "Push to main detected."
+          echo "CI succeeded."
+          echo "This run is eligible to continue toward deployment."
 
-      - name: STEP-4 -- CI Failure Message
+      - name: STEP-4 -- CI Failure
         if: needs.JOB_1-Terraform-CI.result == 'failure'
         run: |
-          echo "JOB 1 Terraform CI has FAILED."
-          echo "Terraform deployment should NOT proceed."
+          echo "CI failed."
+          echo "Deployment must not proceed."
