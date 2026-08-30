@@ -123,3 +123,43 @@ jobs:
 
       - name: STEP-5 -- Terraform APPLY
         run: terraform apply tfplan
+
+
+  JOB_4-Pipeline-Diagnostics:
+    needs: 
+      - JOB_1-Terraform-CI
+
+    runs-on:
+      group: my_runner_group
+
+    if: always()
+    
+    steps:
+
+      - name: STEP-1 -- Show Upstream Result
+        run: |
+          echo "JOB_1 Result: ${{ needs.JOB_1-Terraform-CI.result }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+       
+      - name: STEP-2 -- PR CI Success
+        if: |
+          github.event_name == 'pull_request' &&
+          needs.JOB_1-Terraform-CI.result == 'success'
+        run: |
+          echo "PR validation Succeeded"
+          echo "No deployment should happen here."
+
+      - name: STEP-3 -- Main Branch Deployment Eligible
+        if: |
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main'
+        run: |
+          echo "Push to main detected."
+          echo "This run is eligible for the CD path."
+
+      - name: STEP-4 -- CI Failure
+        if: needs.JOB_1-Terraform-CI.result == 'failure'
+        run: |
+          echo "CI failed."
+          echo "Deployment must not proceed."
